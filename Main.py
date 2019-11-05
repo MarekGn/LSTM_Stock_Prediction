@@ -1,7 +1,8 @@
 from Networks.NetworkTools import load_data
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from Networks.RNN import RNN
+from Networks.RNN import RNN, create_training_dataset_with_squence
+from sklearn.preprocessing import MinMaxScaler
 
 if __name__ == '__main__':
     ## DATA ##
@@ -14,30 +15,41 @@ if __name__ == '__main__':
     # Name of output dataframe column
     outputColName = "MCSFClose"
     # Number of training records checked before network weights update
-    batchSize = 200
+    batchSize = 32
     # Percent of training data from all data records (Rest is for testing)
     trainDataPart = 0.8
+    # Number of epochs
+    epoch = 1000
 
 
     ## CALCULATIONS ##
     # Loading files as array of dataframes
     dataDf = load_data(fileNames)
+
     # Merging all dataframes to one dataframe
     dataDf = pd.concat(dataDf, axis=1)
+
     # Spliting data to train data and validation data
     trainDf, testDf = train_test_split(dataDf, train_size=trainDataPart, test_size=1-trainDataPart, shuffle=False)
     print("Train and Test data size", len(trainDf), len(testDf))
+
     # Create the RNN network
     rnn = RNN(lookback)
+
+    # Create data scaler
+    scaler = MinMaxScaler(feature_range=(0, 1))
+
     # Scale the data
-    trainData = trainDf.loc[:, ].values
-    testData = testDf.loc[:, ].values
-    trainData = rnn.scale_and_fit_data(trainData)
-    testData = rnn.scale_data(testData)
+    trainData = scaler.fit_transform(trainDf.loc[:, ].values)
+    testData = scaler.transform(testDf.loc[:, ].values)
+
     # Creating sequence data for rnn network
-    rnn.create_training_dataset_with_squence(trainData, dataDf.columns.get_loc(outputColName))
+    seqTrainX, seqTrainY = create_training_dataset_with_squence(trainData, dataDf.columns.get_loc(outputColName), lookback)
+    seqValX, seqValY = create_training_dataset_with_squence(testData, dataDf.columns.get_loc(outputColName), lookback)
+
     # Configuring network (Build layer, add optimizers)
-    rnn.create_model()
+    rnn.create_model(seqTrainX.shape[2])
     rnn.configure()
+
     # Network training
-    rnn.train(batchSize=batchSize, epochs=10)
+    rnn.train(batchSize=batchSize, epochs=epoch, x=seqTrainX, y=seqTrainY, valX=seqValX, valY=seqValY)
