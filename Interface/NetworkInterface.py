@@ -7,9 +7,5 @@ class Network(ABC):
         pass
 
     @abstractmethod
-    def load_network(self, suffix="train"):
-        pass
-
-    @abstractmethod
     def train(self, x, y, valX, valY, batchSize, epochs):
         pass

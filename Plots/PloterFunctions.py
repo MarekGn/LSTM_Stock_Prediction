@@ -20,21 +20,22 @@ def plot_net_training_process():
     plt.savefig("trainprocess.pdf")
 
 
-def plot_future_prediction(trainData, predData, scaler, outputIdxColumn, lookback):
+def plot_future_prediction(seqTrainX, seqTrainY, seqFutureX, seqFutureY, rnn, scalerY):
     # FOR FUTURE REFACTORING
     # NEED REFACTORING SO MUCH. JUST FOR FAST PLOT PURPOSE
-    seqTrainDataX, seqTrainDataY = create_training_dataset_with_squence(trainData, outputIdxColumn, lookback)
-    seqFutureDataX, seqFutureDataY = create_training_dataset_with_squence(predData, outputIdxColumn, lookback)
-    rnn = RNN(0)
-    rnn.load_network()
-    predTrain = rnn.predict(seqTrainDataX)
-    predFuture = rnn.predict(seqFutureDataX)
+    predTrain = rnn.predict(seqTrainX)
+    predFuture = rnn.predict(seqFutureX)
+
+    predTrain = scalerY.inverse_transform(predTrain.reshape(-1, 1))
+    predFuture = scalerY.inverse_transform(predFuture.reshape(-1, 1))
+    seqTrainY = scalerY.inverse_transform(seqTrainY.reshape(-1, 1))
+    seqFutureY = scalerY.inverse_transform(seqFutureY.reshape(-1, 1))
 
 
-    plt.plot(np.arange(len(seqTrainDataX)), seqTrainDataY, color='darkblue')
-    plt.plot(np.arange(len(seqTrainDataX), len(seqTrainDataX)+len(seqFutureDataX)), seqFutureDataY, color="crimson")
-    plt.plot(np.arange(len(seqTrainDataX)), predTrain)
-    plt.plot(np.arange(len(seqTrainDataX), len(seqTrainDataX)+len(seqFutureDataX)), predFuture)
+    plt.plot(np.arange(len(seqTrainX)), seqTrainY, color='darkblue')
+    plt.plot(np.arange(len(seqTrainX), len(seqTrainX)+len(seqFutureX)), seqFutureY, color="crimson")
+    plt.plot(np.arange(len(seqTrainX)), predTrain)
+    plt.plot(np.arange(len(seqTrainX), len(seqTrainX)+len(seqFutureX)), predFuture)
     plt.legend(("real train y", "RDD predicted train y", "real prediction y", "RNN predicted y"), ncol=1, loc="best")
 
     plt.savefig("prediction.pdf")

@@ -1,21 +1,14 @@
 from Networks.NetworkTools import load_data
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from Networks.RNN import RNN, create_training_dataset_with_squence
+from Networks.RNN import RNN, create_training_dataset_with_squence, load_network
 from sklearn.preprocessing import MinMaxScaler
 from Plots.PloterFunctions import plot_net_training_process, plot_future_prediction
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-def train_LSTM_network(lookback, outputColIdx, batchSize, trainDataPart, epoch, trainData):
-    # Make data sequences proper for LSTM network
-    seqDataX, seqDataY = create_training_dataset_with_squence(trainData, outputColIdx, lookback)
-
-    # Spliting data to train data and validation data
-    X_train, X_test, y_train, y_test = train_test_split(seqDataX, seqDataY, test_size=1-trainDataPart, shuffle=True)
-    print("TrainX {}    TrainY {}   TestX {}    TestY {}".format(len(X_train), len(y_train), len(X_test), len(y_test)))
-
+def train_LSTM_network(X_train, y_train, X_test, y_test, lookback, batchSize, epoch):
     # Create the RNN network
     rnn = RNN(lookback)
 
@@ -42,7 +35,7 @@ if __name__ == '__main__':
     # Percent of training data from all data records (Rest is for testing)
     trainDataPart = 0.9
     # Number of epochs
-    epoch = 100
+    epoch = 10
     # Part of data for prediction in days (not for training)
     pred_part = 300
 
@@ -58,15 +51,30 @@ if __name__ == '__main__':
     predDf = dataDf[-pred_part-lookback:]
 
     # Create data scaler
-    scaler = MinMaxScaler(feature_range=(0, 1))
+    scalerX = MinMaxScaler(feature_range=(-1, 1))
+    scalerY = MinMaxScaler(feature_range=(-1, 1))
 
     # Scale the data
-    scaledTrainData = scaler.fit_transform(trainDf.loc[:, ].values)
-    scaledPredData = scaler.transform(predDf.loc[:, ].values)
+    scaledTrainData = scalerX.fit_transform(trainDf.loc[:, ].values)
+    scaledFutureData = scalerX.transform(predDf.loc[:, ].values)
 
-    plot_future_prediction(scaledTrainData, scaledPredData, scaler, dataDf.columns.get_loc(outputColName), lookback)
-    # train_LSTM_network(lookback, dataDf.columns.get_loc(outputColName), batchSize, trainDataPart, epoch, scaledTrainData)
-    # plot_net_training_process()
+    # Fit the scalerY for later use in inverse_transform RNN predicions
+    # (predicted Y data have different shape than X data so it need another scaler)
+    scalerY.fit(trainDf[outputColName].values.reshape(-1, 1))
+
+    # Make data sequences proper for LSTM network
+    seqTrainX, seqTrainY = create_training_dataset_with_squence(scaledTrainData, dataDf.columns.get_loc(outputColName), lookback)
+    seqFutureX, seqFutureY = create_training_dataset_with_squence(scaledFutureData, dataDf.columns.get_loc(outputColName), lookback)
+
+    # Spliting data to train data and validation data
+    X_train, X_test, y_train, y_test = train_test_split(seqTrainX, seqTrainY, test_size=1 - trainDataPart, shuffle=True)
+    print("TrainX {}    TrainY {}   TestX {}    TestY {}".format(len(X_train), len(y_train), len(X_test), len(y_test)))
+
+
+    train_LSTM_network(X_train, y_train, X_test, y_test, lookback, batchSize, epoch)
+    # rnn = load_network(lookback)
+    # plot_future_prediction(seqTrainX, seqTrainY, seqFutureX, seqFutureY, rnn, scalerY)
+    plot_net_training_process()
 
 
 

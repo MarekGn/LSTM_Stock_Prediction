@@ -41,8 +41,10 @@ class RNN(Network):
         # Training
         self.model.fit(x, y, validation_data=(valX, valY), epochs=epochs, batch_size=batchSize, verbose=2, shuffle=True, callbacks=[es, csv_logger ,valChp, trainChp])
 
-    def load_network(self, suffix="train"):
-        self.model = load_model("dnn{}.h5".format(suffix))
+def load_network(lookback, suffix="train"):
+    rnn = RNN(lookback)
+    rnn.model = load_model("dnn{}.h5".format(suffix))
+    return rnn
 
 
 def create_training_dataset_with_squence(trainData, outputIdx, lookback):
