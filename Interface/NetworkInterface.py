@@ -7,13 +7,9 @@ class Network(ABC):
         pass
 
     @abstractmethod
-    def load_network(self, path):
+    def load_network(self, suffix="train"):
         pass
 
     @abstractmethod
-    def save_network(self, path):
-        pass
-
-    @abstractmethod
-    def check_mse_accuracy(self):
+    def train(self, x, y, valX, valY, batchSize, epochs):
         pass

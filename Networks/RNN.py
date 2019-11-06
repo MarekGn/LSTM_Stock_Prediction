@@ -1,28 +1,27 @@
 import numpy as np
-from tensorflow.python.keras.models import Sequential
+from Interface.NetworkInterface import Network
+from tensorflow.python.keras.models import Sequential, load_model
 from tensorflow.python.keras.layers import Dense, LSTM, Activation, Dropout
 from tensorflow.python.keras.utils.generic_utils import get_custom_objects
 from tensorflow.python.keras import optimizers, backend as K
 from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger
 
-class RNN:
+class RNN(Network):
     def __init__(self, lookback):
         self.lookback = lookback
         self.model = None
         get_custom_objects().update({'bent': Bent(bent)})
 
-    # def predict(self, x):
-    #     self.create_dataset(x=x, training=False)
-    #     prediction = self.model.predict(self.predX, batch_size=1)
-    #     prediction = self.Yscaler.inverse_transform(prediction)
-    #     return prediction
+    def predict(self, x):
+        prediction = self.model.predict(x)
+        return prediction
 
     def create_model(self, inputShape):
         self.model = Sequential()
         self.model.add(LSTM(units=128, input_shape=(self.lookback, inputShape), return_sequences=True, activation='bent'))
-        self.model.add(Dropout(0.1))
-        self.model.add(LSTM(units=128, return_sequences=False, activation='bent'))
-        self.model.add(Dropout(0.1))
+        self.model.add(Dropout(0.2))
+        self.model.add(LSTM(units=64, return_sequences=False, activation='bent'))
+        self.model.add(Dropout(0.2))
         self.model.add(Dense(units=64, activation='bent'))
         self.model.add(Dropout(0.1))
         self.model.add(Dense(units=32, activation='bent'))
@@ -42,6 +41,9 @@ class RNN:
         # Training
         self.model.fit(x, y, validation_data=(valX, valY), epochs=epochs, batch_size=batchSize, verbose=2, shuffle=True, callbacks=[es, csv_logger ,valChp, trainChp])
 
+    def load_network(self, suffix="train"):
+        self.model = load_model("dnn{}.h5".format(suffix))
+
 
 def create_training_dataset_with_squence(trainData, outputIdx, lookback):
     # outputIdx is the index of out output column
@@ -53,7 +55,7 @@ def create_training_dataset_with_squence(trainData, outputIdx, lookback):
     for i in range(dim_0):
         x[i] = trainData[i:lookback + i]
         y[i] = trainData[lookback + i, outputIdx]
-    print("shape of Input and Output data ", np.shape(x), np.shape(y))
+    print("Shape of Input and Output data ", np.shape(x), np.shape(y))
     return x, y
 
 
