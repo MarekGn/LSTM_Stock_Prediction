@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+from sklearn.externals import joblib
 
 
 def load_data(fileNames):
@@ -12,3 +13,18 @@ def load_data(fileNames):
             print("Exception message:")
             print(e.args)
     return dfs
+
+
+def save_scalers(scalerX, scalerY):
+    scalerX_filename = "scalerX.save"
+    scalerY_filename = "scalerY.save"
+    joblib.dump(scalerX, scalerX_filename)
+    joblib.dump(scalerY, scalerY_filename)
+
+
+def load_scalers():
+    scalerX_filename = "scalerX.save"
+    scalerY_filename = "scalerY.save"
+    scalerX= joblib.load(scalerX_filename)
+    scalerY = joblib.load(scalerY_filename)
+    return scalerX, scalerY

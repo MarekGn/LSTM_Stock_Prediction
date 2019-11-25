@@ -18,18 +18,15 @@ class RNN(Network):
 
     def create_model(self, inputShape):
         self.model = Sequential()
-        self.model.add(LSTM(units=128, input_shape=(self.lookback, inputShape), return_sequences=True, activation='bent'))
-        self.model.add(Dropout(0.2))
-        self.model.add(LSTM(units=64, return_sequences=False, activation='bent'))
-        self.model.add(Dropout(0.2))
+        self.model.add(LSTM(units=64, input_shape=(self.lookback, inputShape), return_sequences=False, activation='bent'))
+        self.model.add(Dropout(0.1))
         self.model.add(Dense(units=64, activation='bent'))
         self.model.add(Dropout(0.1))
         self.model.add(Dense(units=32, activation='bent'))
-        self.model.add(Dropout(0.1))
         self.model.add(Dense(units=1, activation='bent'))
 
     def configure(self):
-        optimizer = optimizers.RMSprop(lr=1e-4)
+        optimizer = optimizers.Adam(lr=1e-6)
         self.model.compile(optimizer=optimizer, loss="mean_squared_error")
 
     def train(self, x, y, valX, valY, batchSize=32, epochs=100):
