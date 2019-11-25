@@ -1,4 +1,4 @@
-SCHEMA = {
+GDELT2_SCHEMA = {
     'events': {
         'columns-dtypes': {
             'globaleventid': 'int64',
@@ -67,7 +67,34 @@ SCHEMA = {
                         'actiongeo_countrycode'],
         'matches': ['actor1countrycode', 'actor2countrycode', 'actor1geo_countrycode', 'actor2geo_countrycode',
                        'actiongeo_countrycode'],
-        'cameo-families': ['1', '3', '7', '8', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'],
+        'cameo-families': ['01', '03', '07', '08', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'],
         'avg_tone': {'-min': -4.5, '+min': 4.5}
+    }
+}
+
+GDELT1_SCHEMA = {
+    'events': {
+        'columns-dtypes': {
+            'Date': str,
+            'Source': str,
+            'Target': str,
+            'CAMEOCode': str,
+            'NumEvents': int,
+            'NumArts': int,
+            'QuadClass': int,
+            'Goldstein': float,
+            'SourceGeoType': float,
+            'SourceGeoLat': float,
+            'SourceGeoLong': float,
+            'TargetGeoType': float,
+            'TargetGeoLat': float,
+            'TargetGeoLong': float,
+            'ActionGeoType': float,
+            'ActionGeoLat': float,
+            'ActionGeoLong': float
+        },
+        'useful_cols': ['Date', 'Source', 'Target', 'CAMEOCode', 'NumEvents', 'NumArts', 'Goldstein'],
+        'cameo-families': ['1', '3', '7', '8', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'],
+        'matches': ['Source', 'Target']
     }
 }
