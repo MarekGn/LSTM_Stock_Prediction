@@ -32,8 +32,8 @@ class RNN(Network):
     def train(self, x, y, valX, valY, batchSize=32, epochs=100):
         # Callbacks
         # es = EarlyStopping(monitor='loss', patience=15000, min_delta=1e-8)
-        # valChp = ModelCheckpoint(filepath="dnnvalidation.h5", monitor='val_loss', verbose=0, save_best_only=True, mode='min')
-        # trainChp = ModelCheckpoint(filepath="dnntrain.h5", monitor='loss', verbose=0, save_best_only=True, mode='min')
+        # valChp = ModelCheckpoint(filepath="rnnvalidation.h5", monitor='val_loss', verbose=0, save_best_only=True, mode='min')
+        # trainChp = ModelCheckpoint(filepath="rnntrain.h5", monitor='loss', verbose=0, save_best_only=True, mode='min')
         trainValCb = TrainValCallback()
         csv_logger = CSVLogger('training.log')
         # Training
@@ -42,7 +42,7 @@ class RNN(Network):
 
 def load_network(lookback, suffix="train"):
     rnn = RNN(lookback)
-    rnn.model = load_model("dnn{}.h5".format(suffix))
+    rnn.model = load_model("rnn{}.h5".format(suffix))
     return rnn
 
 
@@ -69,7 +69,7 @@ class TrainValCallback(Callback):
         currentDistance = logs.get('loss')**2 + logs.get('val_loss')**2
         if currentDistance < self.distance:
             self.distance = currentDistance
-            self.model.save("trainval.h5")
+            self.model.save("rnntrainval.h5")
 
 
 class Bent(Activation):
