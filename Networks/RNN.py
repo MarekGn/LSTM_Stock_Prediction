@@ -4,7 +4,7 @@ from tensorflow.python.keras.models import Sequential, load_model
 from tensorflow.python.keras.layers import Dense, LSTM, Activation, Dropout
 from tensorflow.python.keras.utils.generic_utils import get_custom_objects
 from tensorflow.python.keras import optimizers, backend as K
-from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger
+from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger, Callback
 
 class RNN(Network):
     def __init__(self, lookback):
@@ -26,17 +26,19 @@ class RNN(Network):
         self.model.add(Dense(units=1, activation='bent'))
 
     def configure(self):
-        optimizer = optimizers.Adam(lr=1e-6)
+        optimizer = optimizers.Adam(lr=1e-4)
         self.model.compile(optimizer=optimizer, loss="mean_squared_error")
 
     def train(self, x, y, valX, valY, batchSize=32, epochs=100):
         # Callbacks
-        es = EarlyStopping(monitor='loss', patience=15000, min_delta=1e-8)
+        # es = EarlyStopping(monitor='loss', patience=15000, min_delta=1e-8)
+        # valChp = ModelCheckpoint(filepath="dnnvalidation.h5", monitor='val_loss', verbose=0, save_best_only=True, mode='min')
+        # trainChp = ModelCheckpoint(filepath="dnntrain.h5", monitor='loss', verbose=0, save_best_only=True, mode='min')
+        trainValCb = TrainValCallback()
         csv_logger = CSVLogger('training.log')
-        valChp = ModelCheckpoint(filepath="dnnvalidation.h5", monitor='val_loss', verbose=0, save_best_only=True, mode='min')
-        trainChp = ModelCheckpoint(filepath="dnntrain.h5", monitor='loss', verbose=0, save_best_only=True, mode='min')
         # Training
-        self.model.fit(x, y, validation_data=(valX, valY), epochs=epochs, batch_size=batchSize, verbose=2, shuffle=True, callbacks=[es, csv_logger ,valChp, trainChp])
+        self.model.fit(x, y, validation_data=(valX, valY), batch_size=batchSize, epochs=epochs, verbose=2, shuffle=True, callbacks=[trainValCb, csv_logger])
+
 
 def load_network(lookback, suffix="train"):
     rnn = RNN(lookback)
@@ -56,6 +58,18 @@ def create_training_dataset_with_squence(trainData, outputIdx, lookback):
         y[i] = trainData[lookback + i, outputIdx]
     print("Shape of Input and Output data ", np.shape(x), np.shape(y))
     return x, y
+
+
+class TrainValCallback(Callback):
+    def __init__(self):
+        super().__init__()
+        self.distance = np.inf
+
+    def on_epoch_end(self, epoch, logs={}):
+        currentDistance = logs.get('loss')**2 + logs.get('val_loss')**2
+        if currentDistance < self.distance:
+            self.distance = currentDistance
+            self.model.save("trainval.h5")
 
 
 class Bent(Activation):
