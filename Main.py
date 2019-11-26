@@ -72,13 +72,13 @@ if __name__ == '__main__':
     print("TrainX {}    TrainY {}   TestX {}    TestY {}".format(len(X_train), len(y_train), len(X_test), len(y_test)))
 
 
-    # train_LSTM_network(X_train, y_train, X_test, y_test, lookback, batchSize, epoch)
-    scalerX, scalerY = load_scalers()
-    rnn = load_network(lookback, suffix='train')
-    plot_train_and_future_prediction(seqTrainX, seqTrainY, seqFutureX, seqFutureY, rnn, scalerY)
-    plot_future(seqFutureX, seqFutureY, rnn, scalerY)
-    plot_train(seqTrainX, seqTrainY, rnn, scalerY)
-    plot_net_training_process()
+    train_LSTM_network(X_train, y_train, X_test, y_test, lookback, batchSize, epoch)
+    # scalerX, scalerY = load_scalers()
+    # rnn = load_network(lookback, suffix='train')
+    # plot_train_and_future_prediction(seqTrainX, seqTrainY, seqFutureX, seqFutureY, rnn, scalerY)
+    # plot_future(seqFutureX, seqFutureY, rnn, scalerY)
+    # plot_train(seqTrainX, seqTrainY, rnn, scalerY)
+    # plot_net_training_process()
 
 
 
