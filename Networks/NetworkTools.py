@@ -9,7 +9,7 @@ def load_data(fileNames):
         try:
             dfs.append(pd.read_csv(os.path.join("Res", name), engine='python'))
         except FileNotFoundError as e:
-            print("An exception occured while trying to load the data file")
+            print("An exception occurred while trying to load the data file")
             print("Exception message:")
             print(e.args)
     return dfs
