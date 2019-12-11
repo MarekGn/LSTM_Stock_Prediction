@@ -23,9 +23,9 @@ if __name__ == '__main__':
     # Names of files that we want to use
     fileNames = ["dji_filtered.csv", "gold_filtered.csv", "mcsf_filtered.csv", "oil_filtered.csv",
                  "shanghai_filtered.csv",
-                 "sp500_filtered.csv"]
+                 "sp500_filtered.csv", "events_filtered_scaled.csv"]
     # Number of days that rnn network lookback while training
-    lookback = 60
+    lookback = 30
     # Name of output dataframe column
     outputColName = "MCSFClose"
     # Number of training records checked before network weights update
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     # Percent of training data from all data records (Rest is for testing)
     trainDataPart = 0.9
     # Number of epochs
-    epoch = 500
+    epoch = 5000
     # Part of data for prediction in days (not for training)
     pred_part = 30
 
@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     train_LSTM_network(X_train, y_train, X_test, y_test, lookback, batchSize, epoch)
     # scalerX, scalerY = load_scalers()
-    # rnn = load_network(lookback, suffix='train')
+    # rnn = load_network(lookback, suffix='trainval')
     # plot_train_and_future_prediction(seqTrainX, seqTrainY, seqFutureX, seqFutureY, rnn, scalerY)
     # plot_future(seqFutureX, seqFutureY, rnn, scalerY)
     # plot_train(seqTrainX, seqTrainY, rnn, scalerY)

@@ -4,7 +4,7 @@ from tensorflow.python.keras.models import Sequential, load_model
 from tensorflow.python.keras.layers import Dense, LSTM, Activation, Dropout
 from tensorflow.python.keras.utils.generic_utils import get_custom_objects
 from tensorflow.python.keras import optimizers, backend as K
-from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger, Callback
+from tensorflow.python.keras.callbacks import CSVLogger, Callback
 
 class RNN(Network):
     def __init__(self, lookback):
@@ -18,11 +18,12 @@ class RNN(Network):
 
     def create_model(self, inputShape):
         self.model = Sequential()
-        self.model.add(LSTM(units=64, input_shape=(self.lookback, inputShape), return_sequences=False, activation='bent'))
+        self.model.add(LSTM(units=128, input_shape=(self.lookback, inputShape), return_sequences=False, activation='bent'))
         self.model.add(Dropout(0.1))
         self.model.add(Dense(units=64, activation='bent'))
         self.model.add(Dropout(0.1))
-        self.model.add(Dense(units=32, activation='bent'))
+        self.model.add(Dense(units=64, activation='bent'))
+        self.model.add(Dropout(0.1))
         self.model.add(Dense(units=1, activation='bent'))
 
     def configure(self):
@@ -31,9 +32,6 @@ class RNN(Network):
 
     def train(self, x, y, valX, valY, batchSize=32, epochs=100):
         # Callbacks
-        # es = EarlyStopping(monitor='loss', patience=15000, min_delta=1e-8)
-        # valChp = ModelCheckpoint(filepath="rnnvalidation.h5", monitor='val_loss', verbose=0, save_best_only=True, mode='min')
-        # trainChp = ModelCheckpoint(filepath="rnntrain.h5", monitor='loss', verbose=0, save_best_only=True, mode='min')
         trainValCb = TrainValCallback()
         csv_logger = CSVLogger('training.log')
         # Training
