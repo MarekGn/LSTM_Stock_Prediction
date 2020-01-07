@@ -33,9 +33,9 @@ if __name__ == '__main__':
     # Percent of training data from all data records (Rest is for testing)
     trainDataPart = 0.9
     # Number of epochs
-    epoch = 5000
+    epoch = 520
     # Part of data for prediction in days (not for training)
-    pred_part = 30
+    pred_part = 180
 
     ######     CALCULATIONS    ######
     # Loading files as array of dataframes
@@ -43,7 +43,26 @@ if __name__ == '__main__':
 
     # Merging all dataframes to one dataframe
     dataDf = pd.concat(dataDfArr, axis=1)
-
+    # dataDf = dataDf.drop([
+    #     "DJIOpen",
+    #     "DJIHigh",
+    #     "DJILow",
+    #     "GoldOpen",
+    #     "GoldHigh",
+    #     "GoldLow",
+    #     "MCSFOpen",
+    #     "MCSFHigh",
+    #     "MCSFLow",
+    #     "OILOpen",
+    #     "OILHigh",
+    #     "OILLow",
+    #     "ShanghaiOpen",
+    #     "ShanghaiHigh",
+    #     "ShanghaiLow",
+    #     "SP500Open",
+    #     "SP500High",
+    #     "SP500Low"],
+    #     axis = 1)
     # Splitting dataframes for training and for future prediction
     trainDf = dataDf[0:-pred_part]
     futureDf = dataDf[-pred_part - lookback:]
