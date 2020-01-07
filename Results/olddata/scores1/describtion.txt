@@ -1,0 +1,16 @@
+# Number of days that rnn network lookback while training
+lookback = 30
+# Name of output dataframe column
+outputColName = "MCSFClose"
+# Number of training records checked before network weights update
+batchSize = 32
+# Percent of training data from all data records (Rest is for testing)
+trainDataPart = 0.9
+# Number of epochs
+epoch = 520
+# Part of data for prediction in days (not for training)
+pred_part = 180
+
+net 43-128-64-64-1
+
+
